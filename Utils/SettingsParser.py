@@ -1,6 +1,8 @@
+'''获取设置项的工具函数'''
+
 from typing import Any
 import settings
-from Utils.Exceptions import EmptySettingsValueError
+from Utils.Exceptions import NoSuchSettingError
 
 
 def get_settings() -> dict:
@@ -8,9 +10,7 @@ def get_settings() -> dict:
     attrs = [i for i in dir(settings) if i[:2] != '__' and i[-2:] != '__']
     attrs_dic = {}
     for i in attrs:
-        v = getattr(settings, i)
-        if not v:
-            raise EmptySettingsValueError(i)
+        v = get_a_setting(i)
         attrs_dic[i] = v
     return attrs_dic
 
@@ -22,7 +22,10 @@ def get_a_setting(name: str) -> Any:
     Args:
         name (str): 要获取的设置项
     """
-    v = getattr(settings, name)
-    if not v:
-        raise EmptySettingsValueError(name)
-    return v
+    name = name.upper()
+    try:
+        v = getattr(settings, name)
+    except:
+        raise NoSuchSettingError(name)
+    else:
+        return v

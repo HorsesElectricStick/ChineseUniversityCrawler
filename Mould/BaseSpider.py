@@ -3,7 +3,7 @@ from typing import Callable, List
 from Utils.SettingsParser import get_a_setting
 
 
-class Spider:
+class BaseSpider:
     '''多线程的爬虫基类'''
 
     def __init__(self, target: Callable, *args, **kwargs) -> None:
@@ -17,8 +17,10 @@ class Spider:
         self._threads: List[Process] = []
 
         for i in range(thread_num):
-            thread = Process(target=target, args=args, kwargs=kwargs, name=f"Thread-{i}")
+            thread = Process(target=target, args=args,
+                             kwargs=kwargs, name=f"Thread-{i}")
             self._threads.append(thread)
+
 
     def set_daemon(self, d: bool) -> None:
         """
