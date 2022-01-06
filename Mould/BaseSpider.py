@@ -1,12 +1,13 @@
 from multiprocessing.dummy import Process
 from typing import Callable, List
 from Utils.SettingsParser import get_a_setting
+import logging
 
 
 class BaseSpider:
     '''多线程的爬虫基类'''
 
-    def __init__(self, target: Callable, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """
         初始化
 
@@ -16,11 +17,16 @@ class BaseSpider:
         thread_num = int(get_a_setting("THREAD_NUM"))
         self._threads: List[Process] = []
 
+        self.logger = logging.getLogger(get_a_setting(
+            "root_logging")).getChild(self.__class__.__name__)
+
         for i in range(thread_num):
-            thread = Process(target=target, args=args,
+            thread = Process(target=self.parse, args=args,
                              kwargs=kwargs, name=f"Thread-{i}")
             self._threads.append(thread)
 
+    def parse(self, *args, **kwargs) -> None:
+        ...
 
     def set_daemon(self, d: bool) -> None:
         """

@@ -24,7 +24,7 @@ def main():
     parser.add_argument(
         "-j", "--join", action='store_true', help="以阻塞主线程的方式启动")
     args = parser.parse_args()
-    core = Core(args.modual, args.join)
+    Core(args.modual, args.join)
 
 
 if __name__ == "__main__":

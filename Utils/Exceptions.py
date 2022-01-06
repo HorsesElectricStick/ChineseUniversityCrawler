@@ -1,4 +1,5 @@
 '''自定义异常'''
+import logging
 
 
 class NoSuchSettingError(Exception):

@@ -50,7 +50,10 @@ def _get_driver(timeout: int = 5, download_path: str = None) -> MyDriver:
     options.add_experimental_option("useAutomationExtension", False)
     options.add_experimental_option(
         "prefs", {"download.default_directory": download_path,
-                  "profile.default_content_settings.popups": 0})
+                  "profile.default_content_settings.popups": 0,
+                  "download.prompt_for_download": False,
+                  "download.directory_upgrade": True,
+                  "plugins.always_open_pdf_externally": True})
     options.add_argument("--disable-blink-features=AutomationControlled")
     driver = MyDriver(options=options)
     driver.set_page_load_timeout(timeout)
