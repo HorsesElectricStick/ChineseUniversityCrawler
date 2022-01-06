@@ -26,6 +26,7 @@ class BaseSpider:
             self._threads.append(thread)
 
     def parse(self, *args, **kwargs) -> None:
+        """爬虫默认的处理函数，处理数据的逻辑代码应该写在这里"""
         ...
 
     def set_daemon(self, d: bool) -> None:

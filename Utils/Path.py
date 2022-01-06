@@ -21,4 +21,3 @@ def check_path(path: str, create: bool = False) -> bool:
         os.makedirs(path, exist_ok=True)
 
     return False
-

@@ -12,10 +12,11 @@ class NoSuchSettingError(Exception):
     def __str__(self) -> str:
         return f"无法获取到名为'{self.err_setting}'的设置项"
 
+
 class SpiderClassNotFound(Exception):
     '''没有找到爬虫类，抛出此异常'''
 
-    def __init__(self, module:str) -> None:
+    def __init__(self, module: str) -> None:
         self.module = module
         super().__init__()
 

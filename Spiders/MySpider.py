@@ -1,11 +1,9 @@
 import logging
 from typing import Any, Generator, List, Literal, Union
-from Mould import BaseSpider
-import time
+from Mould import BaseSpider, BaseTask
 from Utils.SettingsParser import get_a_setting
 from Utils.WebDriver import MyDriver, get_driver
 from queue import Queue
-from Mould import BaseTask
 from selenium.webdriver.remote.webelement import WebElement
 
 TASK_TYPE = Literal['u', 'f']
@@ -38,7 +36,9 @@ class MyQueue(Queue):
 
 class Spider(BaseSpider):
     def __init__(self) -> None:
-        urlTask = {'广东工业大学': ['https://yzw.gdut.edu.cn/sszs.htm'], '南京工业大学': ['http://gra.njtech.edu.cn/zsxx/sszs.htm'], '江苏大学':['https://yz.ujs.edu.cn/index/tzgg/14.htm']}
+        urlTask = {'广东工业大学': ['https://yzw.gdut.edu.cn/sszs.htm'],
+                   '南京工业大学': ['http://gra.njtech.edu.cn/zsxx/sszs.htm'],
+                   '江苏大学': ['https://yz.ujs.edu.cn/index/tzgg/14.htm']}
         self.task_queue = MyQueue()
         for school in urlTask:
             for url in urlTask[school]:
@@ -62,9 +62,10 @@ class Spider(BaseSpider):
                 f"任务已处理: {task.__class__.__name__}  {task.school}  {task.url}")
 
     @staticmethod
-    def title_check(driver:MyDriver, school: str, l: List[WebElement]) -> Generator[UrlTask, Any, Any]:
+    def elements_check(driver: MyDriver, school: str, l: List[WebElement]) -> Generator[UrlTask, Any, Any]:
         for i in l:
-            url:str = i.get_attribute('href') if i.get_attribute('href') else ''
+            url: str = i.get_attribute(
+                'href') if i.get_attribute('href') else ''
             title = i.text
             if any(url.endswith(sf) for sf in SUFFIX):
                 Spider.file_handle(driver, school, i)
@@ -74,7 +75,7 @@ class Spider(BaseSpider):
                 yield UrlTask(school, url)
 
     @staticmethod
-    def file_handle(driver: MyDriver, school:str, element: WebElement) -> None:
+    def file_handle(driver: MyDriver, school: str, element: WebElement) -> None:
         driver.set_download_path(school)
         element.click()
 
@@ -82,6 +83,6 @@ class Spider(BaseSpider):
     def url_task_handle(driver: MyDriver, task: FileTask) -> Generator[UrlTask, Any, Any]:
         driver.get(task.url)
         a = driver.find_elements_by_xpath('//a')
-        tasks = Spider.title_check(driver, task.school, a)
+        tasks = Spider.elements_check(driver, task.school, a)
         for task in tasks:
             yield task

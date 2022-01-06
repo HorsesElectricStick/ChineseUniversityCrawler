@@ -12,14 +12,16 @@ class Core:
         modual = importlib.import_module(
             f".{spider_modual}", package="Spiders")
         try:
-            self.spider_class:BaseSpider = modual.Spider
+            self.spider_class: BaseSpider = modual.Spider
         except AttributeError:
             raise SpiderClassNotFound(spider_modual)
         self.join = join
-        logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        logging.basicConfig(
+            level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         logger = logging.getLogger(get_a_setting("ROOT_LOGGING"))
-        sp:BaseSpider = self.spider_class()
-        logger.info(f"核心初始化正确, 爬虫模块:{modual}, 爬虫类:{self.spider_class}, join开关:{self.join}")
+        sp: BaseSpider = self.spider_class()
+        logger.info(
+            f"核心初始化正确, 爬虫模块:{modual}, 爬虫类:{self.spider_class}, join开关:{self.join}")
         start_time = time.time()
         logger.info("任务开始")
         if join:
