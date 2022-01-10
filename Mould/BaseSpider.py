@@ -1,5 +1,5 @@
 from multiprocessing.dummy import Process
-from typing import Callable, List
+from typing import List
 from Utils.SettingsParser import get_a_setting
 import logging
 
@@ -18,7 +18,7 @@ class BaseSpider:
         self._threads: List[Process] = []
 
         self.logger = logging.getLogger(get_a_setting(
-            "root_logging")).getChild(self.__class__.__name__)
+            "root_logger")).getChild(self.__class__.__name__)
 
         for i in range(thread_num):
             thread = Process(target=self.parse, args=args,

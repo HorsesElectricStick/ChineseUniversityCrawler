@@ -19,12 +19,17 @@ def test():
 
 def main():
     parser = argparse.ArgumentParser(description='启动爬虫程序.')
+
     parser.add_argument('modual', metavar='MySpider', type=str,
                         help='你的爬虫模块名，应当放在Spiders文件夹下')
     parser.add_argument(
         "-j", "--join", action='store_true', help="以阻塞主线程的方式启动")
+    parser.add_argument(
+        "-s", "--save_log", action='store_true', help="保存日志文件")
+
     args = parser.parse_args()
-    Core(args.modual, args.join)
+
+    Core(args.modual, args.join, args.save_log)
 
 
 if __name__ == "__main__":

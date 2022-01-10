@@ -13,12 +13,14 @@ class MyDriver(Chrome):
         html = etree.HTML(html)
         return html
 
-    def set_download_path(self, path: str) -> None:
+    def set_download_path(self, path: str) -> str:
         """
         动态修改下载路径
 
         Args:
             path (str): 下载路径，此路径为settings.py中DOWNLOAD_FILE_PATH项的相对路径
+        Returns:
+            str: 下载路径的绝对路径
         """
         path = path.rstrip(os.sep)
         path = os.path.join(os.path.abspath(
@@ -29,6 +31,7 @@ class MyDriver(Chrome):
         params = {'cmd': 'Page.setDownloadBehavior',
                   'params': {'behavior': 'allow', 'downloadPath': path}}
         self.execute("send_command", params)
+        return path
 
 
 def _get_driver(timeout: int = 5, download_path: str = None) -> MyDriver:

@@ -5,6 +5,8 @@ from Utils.SettingsParser import get_a_setting
 from Utils.WebDriver import MyDriver, get_driver
 from queue import Queue
 from selenium.webdriver.remote.webelement import WebElement
+import os
+import time
 
 TASK_TYPE = Literal['u', 'f']
 SUFFIX = ['pdf', 'xls', 'xlsx', 'doc', 'zip', 'rar', '7z', 'docx']
@@ -25,7 +27,7 @@ class FileTask(UrlTask):
 class MyQueue(Queue):
     def __init__(self, maxsize: int = 0) -> None:
         self.logger = logging.getLogger(get_a_setting(
-            "root_logging")).getChild(self.__class__.__name__)
+            "root_logger")).getChild(self.__class__.__name__)
         super().__init__(maxsize=maxsize)
 
     def put(self, item: Union[UrlTask, FileTask]) -> None:
@@ -49,6 +51,8 @@ class Spider(BaseSpider):
     def join_start(self) -> None:
         self.start()
         self.task_queue.join()
+        for thread in self._threads:
+            thread.join()
 
     def parse(self, queue: MyQueue) -> None:
         driver = get_driver()
@@ -60,6 +64,29 @@ class Spider(BaseSpider):
             queue.task_done()
             self.logger.info(
                 f"任务已处理: {task.__class__.__name__}  {task.school}  {task.url}")
+
+        self.download_wait(logger=self.logger)
+
+    @staticmethod
+    def download_wait(logger: logging.Logger = None, seconds=2):
+        """
+        等待所有下载完成
+
+        Args:
+            seconds (int, optional): 每次检查的间隔. Defaults to 2.
+        """
+        while True:
+            need_wait = False
+            for root, dirs, files in os.walk(os.path.abspath(get_a_setting("download_file_path"))):
+                if any(file.endswith('.crdownload') for file in files):
+                    need_wait = True
+                    if logger:
+                        logger.info(f"正在等待文件下载: {root}")
+
+            if not need_wait:
+                break
+            else:
+                time.sleep(seconds)
 
     @staticmethod
     def elements_check(driver: MyDriver, school: str, l: List[WebElement]) -> Generator[UrlTask, Any, Any]:
@@ -76,7 +103,11 @@ class Spider(BaseSpider):
 
     @staticmethod
     def file_handle(driver: MyDriver, school: str, element: WebElement) -> None:
-        driver.set_download_path(school)
+        url: str = element.get_attribute(
+            'href') if element.get_attribute('href') else ''
+        if not url:
+            return
+        path = driver.set_download_path(school)
         element.click()
 
     @staticmethod
